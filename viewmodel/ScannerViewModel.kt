@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.babetech.ucb_admin_access.api.StudentData
 import com.babetech.ucb_admin_access.ble.BleScanner
 import com.babetech.ucb_admin_access.data.StudentRepository
+import com.babetech.ucb_admin_access.domain.usecase.RecordAttendanceUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -12,7 +13,8 @@ import android.util.Log
 
 class ScannerViewModel(
     private val bleScanner: BleScanner,
-    private val repository: StudentRepository
+    private val repository: StudentRepository,
+    private val recordAttendanceUseCase: RecordAttendanceUseCase
 ) : ViewModel() {
 
     companion object {
@@ -63,6 +65,16 @@ class ScannerViewModel(
 
                         if (sd.active == 1) {
                             Log.i(TAG, "Étudiant actif : mise à jour de studentInfo")
+                            
+                            // Enregistrer la présence automatiquement
+                            recordAttendanceUseCase.execute(sd)
+                                .onSuccess {
+                                    Log.i(TAG, "Présence enregistrée avec succès pour ${sd.matricule}")
+                                }
+                                .onFailure { error ->
+                                    Log.w(TAG, "Erreur lors de l'enregistrement de la présence: ${error.message}")
+                                    // On ne bloque pas l'affichage même si l'enregistrement échoue
+                                }
                         } else {
                             _errorMessage.value = "Étudiant inactif ou non trouvé."
                             Log.w(TAG, "Étudiant inactif ou non trouvé pour matricule ${'$'}{sd.matricule}")

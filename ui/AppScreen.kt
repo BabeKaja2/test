@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.dp
 import com.babetech.ucb_admin_access.utils.AppDestinations
 import com.babetech.ucb_admin_access.viewmodel.ScannerViewModel
+import com.babetech.ucb_admin_access.viewmodel.AttendanceViewModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -65,8 +66,8 @@ fun AppScreen() {
                 val viewModel: ScannerViewModel = koinViewModel()
                 when (currentDestination) {
                     AppDestinations.Accueil -> ScannerScreen(viewModel)
-
                     AppDestinations.Message -> RapportScreen()
+                    AppDestinations.Presence -> AttendanceScreen()
                 }
             }
         }
